@@ -1,4 +1,4 @@
-package middleware
+package wat
 
 import (
 	wat "github.com/ChikyuKido/wat/wat/server/db/entity"

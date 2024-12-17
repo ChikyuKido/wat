@@ -1,5 +1,10 @@
-package user
+package wat
 
-func Login() {
+import "github.com/gin-gonic/gin"
+
+func Login() gin.HandlerFunc {
+	return func(c *gin.Context) {
+
+	}
 
 }

@@ -1,54 +1,33 @@
 package wat
 
 import (
-	"errors"
 	"github.com/dgrijalva/jwt-go"
+	"github.com/gin-gonic/gin"
+	"net/http"
 	"os"
 	"time"
 )
 
 var jwtSecret = []byte(os.Getenv("JWT_SECRET"))
 
-type JWTClaim struct {
-	Email string `json:"email"`
-	jwt.StandardClaims
-}
+func GenerateJWT(email string) (string, error) {
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"email": email,
+		"exp":   time.Now().Add(time.Hour * 24 * 30).Unix(),
+	})
 
-func GenerateJWT(email string, persistantLogin bool) (tokenString string, err error) {
-	expirationTime := time.Now().Add(24 * time.Hour)
-	if persistantLogin {
-		expirationTime = time.Now().Add(2160 * time.Hour)
-	}
-	claims := &JWTClaim{
-		Email: email,
-		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: expirationTime.Unix(),
-		},
-	}
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	tokenString, err = token.SignedString(jwtSecret)
-	return
-}
-
-func ValidateToken(signedToken string) (*JWTClaim, error) {
-	token, err := jwt.ParseWithClaims(
-		signedToken,
-		&JWTClaim{},
-		func(token *jwt.Token) (interface{}, error) {
-			return jwtSecret, nil
-		},
-	)
+	tokenString, err := token.SignedString(jwtSecret)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
-	claims, ok := token.Claims.(*JWTClaim)
-	if !ok {
-		err = errors.New("couldn't parse claims")
-		return nil, err
-	}
-	if claims.ExpiresAt < time.Now().Local().Unix() {
-		err = errors.New("token expired")
-		return nil, err
-	}
-	return claims, nil
+	return tokenString, nil
+}
+
+func GetToken(token string) (*jwt.Token, error) {
+	return jwt.Parse(token, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, gin.Error{Err: http.ErrAbortHandler, Type: gin.ErrorTypePublic}
+		}
+		return jwtSecret, nil
+	})
 }

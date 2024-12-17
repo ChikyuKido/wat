@@ -1,13 +1,13 @@
 package wat
 
 import (
-	"github.com/ChikyuKido/wat/wat/server/db"
-	wat "github.com/ChikyuKido/wat/wat/server/db/entity"
+	db "github.com/ChikyuKido/wat/wat/server/db"
+	entity "github.com/ChikyuKido/wat/wat/server/db/entity"
 	"github.com/sirupsen/logrus"
 )
 
 func InsertNewUser(username, password, email string) bool {
-	user := wat.User{
+	user := entity.User{
 		Email:    email,
 		Username: username,
 		Password: password,
@@ -20,14 +20,37 @@ func InsertNewUser(username, password, email string) bool {
 	return true
 }
 
+func GetUserByEmail(email string) *entity.User {
+	var user entity.User
+	if err := db.DB().First(&user, entity.User{Email: email}).Error; err != nil {
+		logrus.Errorf("failed to get user: %v", err)
+		return nil
+	}
+	return &user
+}
+func GetUserByUsername(username string) *entity.User {
+	var user entity.User
+	if err := db.DB().First(&user, entity.User{Username: username}).Error; err != nil {
+		logrus.Errorf("failed to get user: %v", err)
+		return nil
+	}
+	return &user
+}
+func DoesUserByEmailExist(email string) bool {
+	return GetUserByEmail(email) != nil
+}
+func DoesUserByUsernameExist(email string) bool {
+	return GetUserByUsername(email) != nil
+}
+
 func AddPermissionToUser(userID, permissionID uint) bool {
-	var user wat.User
-	if err := db.DB().First(&user, wat.User{ID: userID}).Error; err != nil {
+	var user entity.User
+	if err := db.DB().First(&user, entity.User{ID: userID}).Error; err != nil {
 		logrus.Errorf("failed to get user with id %d: %v", userID, err)
 		return false
 	}
-	var permission wat.Permission
-	if err := db.DB().First(&permission, wat.Permission{ID: permissionID}).Error; err != nil {
+	var permission entity.Permission
+	if err := db.DB().First(&permission, entity.Permission{ID: permissionID}).Error; err != nil {
 		logrus.Errorf("failed to get permission with id %d: %v", permissionID, err)
 		return false
 	}
@@ -39,13 +62,13 @@ func AddPermissionToUser(userID, permissionID uint) bool {
 }
 
 func AddRoleToUser(userID, roleID uint) bool {
-	var user wat.User
-	if err := db.DB().First(&user, wat.User{ID: userID}).Error; err != nil {
+	var user entity.User
+	if err := db.DB().First(&user, entity.User{ID: userID}).Error; err != nil {
 		logrus.Errorf("failed to get user with id %d: %v", userID, err)
 		return false
 	}
-	var role wat.Role
-	if err := db.DB().Preload("Permissions").First(&role, wat.Role{ID: roleID}).Error; err != nil {
+	var role entity.Role
+	if err := db.DB().Preload("Permissions").First(&role, entity.Role{ID: roleID}).Error; err != nil {
 		logrus.Errorf("failed to get role with id %d: %v", roleID, err)
 		return false
 	}
@@ -59,13 +82,13 @@ func AddRoleToUser(userID, roleID uint) bool {
 }
 
 func RemoveRoleFromUser(userID, roleID uint) bool {
-	var user wat.User
-	if err := db.DB().First(&user, wat.User{ID: userID}).Error; err != nil {
+	var user entity.User
+	if err := db.DB().First(&user, entity.User{ID: userID}).Error; err != nil {
 		logrus.Errorf("failed to get user with id %d: %v", userID, err)
 		return false
 	}
-	var role wat.Role
-	if err := db.DB().Preload("Permissions").First(&role, wat.Role{ID: roleID}).Error; err != nil {
+	var role entity.Role
+	if err := db.DB().Preload("Permissions").First(&role, entity.Role{ID: roleID}).Error; err != nil {
 		logrus.Errorf("failed to get role with id %d: %v", roleID, err)
 		return false
 	}

@@ -1,7 +1,7 @@
 package wat
 
 import (
-	"github.com/ChikyuKido/wat/wat/server/db"
+	db "github.com/ChikyuKido/wat/wat/server/db"
 	wat "github.com/ChikyuKido/wat/wat/server/db/entity"
 	"github.com/sirupsen/logrus"
 )
