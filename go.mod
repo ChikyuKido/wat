@@ -1,4 +1,4 @@
-module WebAppTemplate
+module github.com/ChikyuKido/wat
 
 go 1.23.4
 
