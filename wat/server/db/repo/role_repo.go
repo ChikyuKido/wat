@@ -14,7 +14,13 @@ func InsertNewRole(name string) bool {
 	}
 	return true
 }
-
+func GetRoleByName(name string) *wat.Role {
+	var role wat.Role
+	if err := db.DB().Where(wat.Role{Name: name}).First(&role).Error; err != nil {
+		return nil
+	}
+	return &role
+}
 func AddPermissionToRole(roleId uint, permissionID uint) bool {
 	var role wat.Role
 	if err := db.DB().First(&role, wat.Role{ID: roleId}).Error; err != nil {

@@ -1,9 +1,12 @@
 package wat
 
 import (
+	"errors"
 	db "github.com/ChikyuKido/wat/wat/server/db"
 	entity "github.com/ChikyuKido/wat/wat/server/db/entity"
+	util "github.com/ChikyuKido/wat/wat/util"
 	"github.com/sirupsen/logrus"
+	"gorm.io/gorm"
 )
 
 func InsertNewUser(username, password, email string) bool {
@@ -11,7 +14,7 @@ func InsertNewUser(username, password, email string) bool {
 		Email:    email,
 		Username: username,
 		Password: password,
-		Verified: false,
+		Verified: !util.Config.EmailVerification,
 	}
 	if err := db.DB().Create(&user).Error; err != nil {
 		logrus.Errorf("failed to create use: %v", err)
@@ -19,10 +22,20 @@ func InsertNewUser(username, password, email string) bool {
 	}
 	return true
 }
-
+func VerifyUser(userid uint) bool {
+	var user entity.User
+	if err := db.DB().First(&user, entity.User{ID: userid}).Error; err != nil {
+		return false
+	}
+	user.Verified = true
+	if err := db.DB().Save(&user).Error; err != nil {
+		return false
+	}
+	return true
+}
 func GetUserByEmail(email string) *entity.User {
 	var user entity.User
-	if err := db.DB().First(&user, entity.User{Email: email}).Error; err != nil {
+	if err := db.DB().Preload("Permissions").First(&user, entity.User{Email: email}).Error; err != nil {
 		logrus.Errorf("failed to get user: %v", err)
 		return nil
 	}
@@ -30,17 +43,33 @@ func GetUserByEmail(email string) *entity.User {
 }
 func GetUserByUsername(username string) *entity.User {
 	var user entity.User
-	if err := db.DB().First(&user, entity.User{Username: username}).Error; err != nil {
+	if err := db.DB().Preload("Permissions").First(&user, entity.User{Username: username}).Error; err != nil {
 		logrus.Errorf("failed to get user: %v", err)
 		return nil
 	}
 	return &user
 }
 func DoesUserByEmailExist(email string) bool {
-	return GetUserByEmail(email) != nil
+	var user entity.User
+	err := db.DB().First(&user, entity.User{Email: email}).Error
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return false
+	} else if err != nil {
+		logrus.Errorf("failed to get user: %v", err)
+		return true
+	}
+	return true
 }
-func DoesUserByUsernameExist(email string) bool {
-	return GetUserByUsername(email) != nil
+func DoesUserByUsernameExist(username string) bool {
+	var user entity.User
+	err := db.DB().First(&user, entity.User{Username: username}).Error
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return false
+	} else if err != nil {
+		logrus.Errorf("failed to get user: %v", err)
+		return true
+	}
+	return true
 }
 
 func AddPermissionToUser(userID, permissionID uint) bool {

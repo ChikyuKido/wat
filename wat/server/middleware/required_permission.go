@@ -2,6 +2,7 @@ package wat
 
 import (
 	wat "github.com/ChikyuKido/wat/wat/server/db/entity"
+	util "github.com/ChikyuKido/wat/wat/util"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strings"
@@ -9,15 +10,8 @@ import (
 
 func RequiredPermission(permission string) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		user, exists := c.Get("user")
-		if !exists {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "User not found"})
-			c.Abort()
-			return
-		}
-		u, ok := user.(*wat.User)
-		if !ok {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Invalid user type"})
+		u := util.GetUserFromContext(c)
+		if u == nil {
 			c.Abort()
 			return
 		}

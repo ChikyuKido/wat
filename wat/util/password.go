@@ -1,7 +1,6 @@
 package wat
 
 import (
-	wat "github.com/ChikyuKido/wat/wat/server/db/entity"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -13,10 +12,10 @@ func HashPassword(password string) (hashedPassword string, err error) {
 	return string(bytes), nil
 }
 
-func CheckPassword(user wat.User, providedPassword string) error {
-	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(providedPassword))
+func CheckPassword(hashedPassword, providedPassword string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(providedPassword))
 	if err != nil {
-		return err
+		return false
 	}
-	return nil
+	return true
 }

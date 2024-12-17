@@ -4,8 +4,13 @@ import (
 	"github.com/sirupsen/logrus"
 	"net/smtp"
 	"os"
+	"regexp"
 )
 
+func IsValidEmail(email string) bool {
+	var re = regexp.MustCompile(`^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`)
+	return re.MatchString(email)
+}
 func SendEmail(subject, content, address string) error {
 	smtpServer := os.Getenv("SMTP_SERVER")
 	smtpHost := os.Getenv("SMTP_HOST")
@@ -13,7 +18,10 @@ func SendEmail(subject, content, address string) error {
 	to := address
 	password := os.Getenv("SMTP_PASSWORD")
 
-	msg := []byte(subject + "\n" + content)
+	msg := []byte("From: " + from + "\n" +
+		"To: " + to + "\n" +
+		"Subject: " + subject + "\n\n" +
+		content)
 
 	auth := smtp.PlainAuth("", from, password, smtpHost)
 	err := smtp.SendMail(smtpServer, auth, from, []string{to}, msg)
