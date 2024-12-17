@@ -1,7 +1,7 @@
 package wat
 
 import (
-	wat "github.com/ChikyuKido/wat/wat/server/db"
+	"github.com/ChikyuKido/wat/wat/server/db"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )

@@ -1,7 +1,7 @@
 package middleware
 
 import (
-	"Quotium/internal/server/db/entity"
+	wat "github.com/ChikyuKido/wat/wat/server/db/entity"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strings"
@@ -15,7 +15,7 @@ func RequiredPermission(permission string) gin.HandlerFunc {
 			c.Abort()
 			return
 		}
-		u, ok := user.(*entity.User)
+		u, ok := user.(*wat.User)
 		if !ok {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Invalid user type"})
 			c.Abort()
@@ -30,7 +30,7 @@ func RequiredPermission(permission string) gin.HandlerFunc {
 	}
 }
 
-func hasPermission(user *entity.User, roleToCheck string) bool {
+func hasPermission(user *wat.User, roleToCheck string) bool {
 	for _, permission := range user.Permissions {
 		if strings.TrimSpace(permission.Name) == roleToCheck {
 			return true
