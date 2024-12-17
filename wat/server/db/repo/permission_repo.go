@@ -1,13 +1,13 @@
-package repo
+package wat
 
 import (
-	"Quotium/internal/server/db"
-	"Quotium/internal/server/db/entity"
+	"github.com/ChikyuKido/wat/wat/server/db"
+	wat "github.com/ChikyuKido/wat/wat/server/db/entity"
 	"github.com/sirupsen/logrus"
 )
 
 func InsertNewPermission(name string) bool {
-	permission := entity.Permission{
+	permission := wat.Permission{
 		Name: name,
 	}
 	if err := db.DB().Create(&permission).Error; err != nil {

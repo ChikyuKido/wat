@@ -1,13 +1,13 @@
-package repo
+package wat
 
 import (
-	"Quotium/internal/server/db"
-	"Quotium/internal/server/db/entity"
+	"github.com/ChikyuKido/wat/wat/server/db"
+	wat "github.com/ChikyuKido/wat/wat/server/db/entity"
 	"github.com/sirupsen/logrus"
 )
 
 func InsertNewRole(name string) bool {
-	role := entity.Role{Name: name}
+	role := wat.Role{Name: name}
 	if err := db.DB().Create(&role).Error; err != nil {
 		logrus.Errorf("failed to insert new permission: %v", err)
 		return false
@@ -16,13 +16,13 @@ func InsertNewRole(name string) bool {
 }
 
 func AddPermissionToRole(roleId uint, permissionID uint) bool {
-	var role entity.Role
-	if err := db.DB().First(&role, entity.Role{ID: roleId}).Error; err != nil {
+	var role wat.Role
+	if err := db.DB().First(&role, wat.Role{ID: roleId}).Error; err != nil {
 		logrus.Errorf("failed to get role with id %d: %v", roleId, err)
 		return false
 	}
-	var permission entity.Permission
-	if err := db.DB().First(&permission, entity.Permission{ID: permissionID}).Error; err != nil {
+	var permission wat.Permission
+	if err := db.DB().First(&permission, wat.Permission{ID: permissionID}).Error; err != nil {
 		logrus.Errorf("failed to get permission with id %d: %v", permissionID, err)
 		return false
 	}

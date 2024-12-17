@@ -1,4 +1,4 @@
-package entity
+package wat
 
 type User struct {
 	ID          uint         `gorm:"primaryKey"`

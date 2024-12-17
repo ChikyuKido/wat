@@ -1,4 +1,4 @@
-package entity
+package wat
 
 type Verification struct {
 	UUID    string `gorm:"primaryKey"`

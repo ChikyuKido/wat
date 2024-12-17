@@ -1,4 +1,4 @@
-package entity
+package wat
 
 type Permission struct {
 	ID   uint   `gorm:"primaryKey"`
