@@ -9,4 +9,5 @@ var Config struct {
 	EmailVerification    bool
 	EmailVerificationUrl string
 	JwtSecret            string
+	Debug                bool
 }

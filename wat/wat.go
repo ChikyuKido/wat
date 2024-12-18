@@ -27,9 +27,10 @@ func InitWat(engine *gin.Engine, database *gorm.DB, firstInit bool) {
 }
 
 func InitWatWebsite(engine *gin.Engine) {
-	engine.Static("/css", "./website/css")
-	engine.Static("/js", "./website/js")
-	engine.StaticFile("/admin/dashboard", "./website/html/admin/dashboard.html")
+	sites := engine.Group("/")
+	util.ServeFolder("/css/", "./website/css", sites)
+	util.ServeFolder("/js/", "./website/js", sites)
+	util.ServeFile("/admin/dashboard", "./website/html/admin/dashboard.html", sites)
 }
 
 func initEnv() bool {
@@ -52,6 +53,13 @@ func initEnv() bool {
 		checkEnv(util.Config.EmailVerificationUrl, "EMAIL_VERIFICATION_URL")
 	} else {
 		util.Config.EmailVerification = false
+	}
+	debug := os.Getenv("DEBUG")
+	checkEnv(debug, "DEBUG")
+	if debug == "true" {
+		util.Config.Debug = true
+	} else {
+		util.Config.Debug = false
 	}
 
 	util.Config.JwtSecret = os.Getenv("JWT_SECRET")
