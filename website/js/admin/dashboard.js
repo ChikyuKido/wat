@@ -2,7 +2,6 @@ document.addEventListener("DOMContentLoaded", () => {
     loadUsers();
     loadPermissions();
     loadRoles();
-
 });
 
 function loadUsers() {
@@ -11,34 +10,27 @@ function loadUsers() {
         .then(users => {
             const userTable = document.getElementById("userTable");
             userTable.innerHTML = "";
-
-            users.forEach(user => {
-                const row = document.createElement("tr");
-                const permissionContainer = document.createElement("div");
-                user.permissions.forEach(permission => {
-                    const permissionButton = document.createElement("button");
-                    permissionButton.className = "button mr-1 is-small is-info";
-                    permissionButton.innerText = permission.name;
-                    permissionButton.onclick = () => removePermissionFromUser(user.id, permission.id);
-                    permissionContainer.appendChild(permissionButton);
-                });
-
-                row.innerHTML = `
-                        <td>${user.id}</td>
-                        <td>${user.email}</td>
-                        <td>${user.username}</td>
-                        <td>${user.verified}</td>
-                        <td>${permissionContainer.innerHTML}</td>
-                        <td>
-                            <button class="button is-small is-danger" onclick="deleteUser(${user.id})">Delete</button>
-                            <button class="button is-small is-primary" onclick="addPermissions(${user.id})">Add Permission</button>
-                            <button class="button is-small is-primary" onclick="manageRoles(${user.id})">Manage Roles</button>
-                        </td>
-                    `;
-                userTable.appendChild(row);
-            });
+            users.forEach(renderUserRow);
         })
         .catch(error => console.error("Error loading users:", error));
+}
+
+function renderUserRow(user) {
+    const row = document.createElement("tr");
+
+    row.innerHTML = `
+        <td>${user.id}</td>
+        <td>${user.email}</td>
+        <td>${user.username}</td>
+        <td>${user.verified}</td>
+        <td>${user.permissions.map(value => `<button class="button mr-1 is-small is-info" onclick="removePermissionFromUser(${user.id},${value.id})">${value.name}</button>`).join("")}</td>
+        <td>
+            <button class="button is-small is-danger" onclick="deleteUser(${user.id})">Delete</button>
+            <button class="button is-small is-primary" onclick="addPermissions(${user.id})">Add Permission</button>
+            <button class="button is-small is-primary" onclick="manageRoles(${user.id})">Manage Roles</button>
+        </td>
+    `;
+    document.getElementById("userTable").appendChild(row);
 }
 
 function loadPermissions() {
@@ -47,15 +39,16 @@ function loadPermissions() {
         .then(permissions => {
             const select = document.getElementById("permission-dropdown");
             select.innerHTML = "";
-
-            permissions.forEach(permission => {
-                const option = document.createElement("option");
-                option.value = permission.id;
-                option.text = permission.name;
-                select.appendChild(option);
-            });
+            permissions.forEach(renderPermissionOption);
         })
         .catch(error => console.error("Error loading permissions:", error));
+}
+
+function renderPermissionOption(permission) {
+    const option = document.createElement("option");
+    option.value = permission.id;
+    option.text = permission.name;
+    document.getElementById("permission-dropdown").appendChild(option);
 }
 
 function loadRoles() {
@@ -64,16 +57,18 @@ function loadRoles() {
         .then(roles => {
             const select = document.getElementById("role-dropdown");
             select.innerHTML = "";
-
-            roles.forEach(role => {
-                const option = document.createElement("option");
-                option.value = role.id;
-                option.text = role.name;
-                select.appendChild(option);
-            });
+            roles.forEach(renderRoleOption);
         })
         .catch(error => console.error("Error loading roles:", error));
 }
+
+function renderRoleOption(role) {
+    const option = document.createElement("option");
+    option.value = role.id;
+    option.text = role.name;
+    document.getElementById("role-dropdown").appendChild(option);
+}
+
 function addPermissions(userId) {
     document.getElementById("add-permission").onclick = () => {
         const selectedPermissions = getSelectedPermissions();
@@ -86,9 +81,13 @@ function addPermissions(userId) {
 function manageRoles(userId) {
     document.getElementById("add-role").onclick = () => {
         const selectedRoles = getSelectedRoles();
-        const overwriteOldPermissions = confirm("Overwrite old permissions?");
+        const overwriteOldPermissions = document.getElementById("overwrite-old-permissions").value === "on";
         const payload = { user_id: userId, role_id: selectedRoles, overwrite_old_permissions: overwriteOldPermissions };
         addRoleToUser(payload);
+    };
+    document.getElementById("remove-role").onclick = () => {
+        const selectedRoles = getSelectedRoles();
+        removeRoleFromUser(userId, selectedRoles);
     };
     document.getElementById("role-modal").classList.add("is-active");
 }

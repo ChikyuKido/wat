@@ -6,50 +6,38 @@
     <title>Admin Dashboard</title>
     <link href="/css/bulma.css" rel="stylesheet">
     <style>
-        /* styles.css */
-        body {
-            background-color: #f0f0f0;
-        }
-
-        .table {
-            margin-top: 20px;
-        }
-
-        .modal-content {
-            max-width: 500px;
-            margin: auto;
-        }
-
-        .select {
-            width: 100%;
-        }
+        /* Optionally remove existing custom CSS */
     </style>
 </head>
 <body>
 <section class="section">
     <div class="container">
-        <h1 class="title">Admin Dashboard</h1>
+        <h1 class="title is-2">Admin Dashboard</h1>
 
+        <div class="columns">
+            <div class="column">
+                <table class="table is-fullwidth">
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Email</th>
+                        <th>Username</th>
+                        <th>Verified</th>
+                        <th>Permissions</th>
+                        <th>Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody id="userTable">
+                    </tbody>
+                </table>
+            </div>
+        </div>
 
-        <table class="table is-fullwidth">
-            <thead>
-            <tr>
-                <th>ID</th>
-                <th>Email</th>
-                <th>Username</th>
-                <th>Verfied</th>
-                <th>Permissions</th>
-                <th>Actions</th>
-            </tr>
-            </thead>
-            <tbody id="userTable">
-            </tbody>
-        </table>
         <div class="modal" id="permission-modal">
             <div class="modal-background"></div>
             <div class="modal-content modal-content--center">
                 <div class="box">
-                    <h1 class="title">Add Permission</h1>
+                    <h1 class="title is-4">Add Permission</h1>
                     <div class="field">
                         <label class="label">Permission Name</label>
                         <div class="control">
@@ -68,11 +56,12 @@
             </div>
             <button class="modal-close is-large" aria-label="close"></button>
         </div>
+
         <div class="modal" id="role-modal">
             <div class="modal-background"></div>
             <div class="modal-content modal-content--center">
                 <div class="box">
-                    <h1 class="title">Add Permission</h1>
+                    <h1 class="title is-4">Manage Role</h1>
                     <div class="field">
                         <label class="label">Role Name</label>
                         <div class="control">
@@ -85,18 +74,17 @@
                     <div class="field">
                         <div class="control">
                             <button class="button is-primary" id="add-role">Add Role</button>
-                            <button class="button is-primary" id="remove-role">Remove Role</button>
-                            <label>
-                                <input type="checkbox" id="overwrite-old-permissions">
-                                Overwrite old permissions
-                            </label>
+                            <button class="button is-warning" id="remove-role">Remove Role</button>
                         </div>
                     </div>
+                    <label class="checkbox">
+                        <input type="checkbox" id="overwrite-old-permissions">
+                        Overwrite old permissions
+                    </label>
                 </div>
             </div>
             <button class="modal-close is-large" aria-label="close"></button>
         </div>
-
     </div>
 </section>
 
