@@ -26,6 +26,12 @@ func InitWat(engine *gin.Engine, database *gorm.DB, firstInit bool) {
 	logrus.Info("initialized routes")
 }
 
+func InitWatWebsite(engine *gin.Engine) {
+	engine.Static("/css", "./website/css")
+	engine.Static("/js", "./website/js")
+	engine.StaticFile("/admin/dashboard", "./website/html/admin/dashboard.html")
+}
+
 func initEnv() bool {
 	util.Config.WatBaseURL = os.Getenv("WAT_BASEURL")
 	checkEnv(util.Config.WatBaseURL, "WAT_BASEURL")
