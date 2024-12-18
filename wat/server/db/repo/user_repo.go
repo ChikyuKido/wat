@@ -33,6 +33,14 @@ func VerifyUser(userid uint) bool {
 	}
 	return true
 }
+func GetAllUsers() []entity.User {
+	var users []entity.User
+	if err := db.DB().Preload("Permissions").Find(&users).Error; err != nil {
+		logrus.Errorf("failed to get all users: %v", err)
+		return nil
+	}
+	return users
+}
 func GetUserByEmail(email string) *entity.User {
 	var user entity.User
 	if err := db.DB().Preload("Permissions").First(&user, entity.User{Email: email}).Error; err != nil {
@@ -48,6 +56,24 @@ func GetUserByUsername(username string) *entity.User {
 		return nil
 	}
 	return &user
+}
+func GetUserByID(id uint) *entity.User {
+	var user entity.User
+	if err := db.DB().Preload("Permissions").Where(entity.User{ID: id}).First(&user).Error; err != nil {
+		logrus.Errorf("failed to get user: %v", err)
+		return nil
+	}
+	return &user
+}
+func DoesUserByIDExists(id uint) bool {
+	var user entity.User
+	if err := db.DB().First(&user, entity.User{ID: id}).Error; errors.Is(err, gorm.ErrRecordNotFound) {
+		return false
+	} else if err != nil {
+		logrus.Errorf("failed to get user: %v", err)
+		return true
+	}
+	return true
 }
 func DoesUserByEmailExist(email string) bool {
 	var user entity.User
@@ -126,6 +152,44 @@ func RemoveRoleFromUser(userID, roleID uint) bool {
 			logrus.Errorf("failed to append permission with id %d: %v", permission.ID, err)
 			return false
 		}
+	}
+	return true
+}
+
+func RemoveAllPermissionsFromUser(userID uint) bool {
+	var user entity.User
+	if err := db.DB().Preload("Permissions").First(&user, entity.User{ID: userID}).Error; err != nil {
+		logrus.Errorf("failed to get user with id %d: %v", userID, err)
+		return false
+	}
+	for _, permission := range user.Permissions {
+		if err := db.DB().Model(&user).Association("Permissions").Delete(&permission); err != nil {
+			logrus.Errorf("failed to append permission with id %d: %v", permission.ID, err)
+			return false
+		}
+	}
+	return true
+}
+
+func DeleteUser(userID uint) bool {
+	var user = entity.User{
+		ID: userID,
+	}
+	if err := db.DB().Delete(&user).Error; err != nil {
+		logrus.Errorf("failed to delete user: %v", err)
+		return false
+	}
+	return true
+}
+func RemovePermissionFromUser(userID, permissionID uint) bool {
+	var user entity.User
+	if err := db.DB().First(&user, entity.User{ID: userID}).Error; err != nil {
+		logrus.Errorf("failed to get user with id %d: %v", userID, err)
+		return false
+	}
+	if err := db.DB().Model(&user).Association("Permissions").Delete(entity.Permission{ID: permissionID}); err != nil {
+		logrus.Errorf("failed to remove permission with id %d: %v", permissionID, err)
+		return false
 	}
 	return true
 }

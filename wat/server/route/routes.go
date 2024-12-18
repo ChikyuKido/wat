@@ -2,6 +2,7 @@ package wat
 
 import (
 	middleware "github.com/ChikyuKido/wat/wat/server/middleware"
+	adminroute "github.com/ChikyuKido/wat/wat/server/route/admin"
 	userroute "github.com/ChikyuKido/wat/wat/server/route/user"
 	util "github.com/ChikyuKido/wat/wat/util"
 	"github.com/gin-gonic/gin"
@@ -15,4 +16,14 @@ func InitRoutes(r *gin.Engine) {
 		auth.POST("/sendVerification", middleware.RequiredPermission("sendVerification"), userroute.SendVerification())
 		auth.POST("/verify", userroute.Verify())
 	}
+	admin := r.Group("/api/v1/admin")
+	admin.GET("/permissions/list", middleware.RequiredPermission("queryPermissions"), adminroute.GetPermissions())
+	admin.GET("/users/list", middleware.RequiredPermission("queryUsers"), adminroute.GetUsers())
+	admin.GET("/roles/list", middleware.RequiredPermission("queryRoles"), adminroute.GetRoles())
+	admin.GET("/users/addPermissionToUser", middleware.RequiredPermission("changeUserPermissions"), adminroute.AddPermissionToUser())
+	admin.GET("/users/addRoleToUser", middleware.RequiredPermission("changeUserPermissions"), adminroute.AddRoleToUser())
+	admin.GET("/users/deleteUser", middleware.RequiredPermission("deleteUser"), adminroute.DeleteUser())
+	admin.GET("/users/removePermissionFromUser", middleware.RequiredPermission("changeUserPermissions"), adminroute.RemovePermissionToUser())
+	admin.GET("/users/removeRoleFromUser", middleware.RequiredPermission("changeUserPermissions"), adminroute.RemoveRoleFromUser())
+
 }
