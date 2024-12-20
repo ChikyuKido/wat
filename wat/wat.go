@@ -31,6 +31,8 @@ func InitWatWebsite(engine *gin.Engine) {
 	util.ServeFolder("/css/", "./website/css", sites)
 	util.ServeFolder("/js/", "./website/js", sites)
 	util.ServeFile("/admin/dashboard", "./website/html/admin/dashboard.html", sites)
+	util.ServeFile("/auth/login", "./website/html/auth/login.html", sites)
+	util.ServeFile("/auth/register", "./website/html/auth/register.html", sites)
 }
 
 func initEnv() bool {
@@ -84,16 +86,14 @@ func dataInit() {
 	repo.InsertNewRole("guest")
 	repo.AddPermissionToRole(1, 1)
 	repo.AddPermissionToRole(1, 2)
-	repo.AddPermissionToRole(1, 4)
-	repo.AddPermissionToRole(1, 5)
-	repo.AddPermissionToRole(1, 6)
-	repo.AddPermissionToRole(1, 7)
-	repo.AddPermissionToRole(1, 8)
 	repo.InsertNewRole("unverifiedUser")
 	repo.AddPermissionToRole(2, 1)
 	repo.AddPermissionToRole(2, 2)
 	repo.AddPermissionToRole(2, 3)
 	repo.InsertNewRole("user")
+	repo.AddPermissionToRole(3, 1)
+	repo.AddPermissionToRole(3, 2)
+	repo.AddPermissionToRole(3, 3)
 	repo.InsertNewUser("guest", "", "guest")
 	repo.AddRoleToUser(1, 1)
 }

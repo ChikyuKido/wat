@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Page</title>
+    <link href="/css/bulma.css" rel="stylesheet">
+    <style>
+        .login-container {
+            max-width: 400px;
+            margin: auto;
+            padding-top: 50px;
+        }
+        .login-form {
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-radius: 5px;
+        }
+        .login-form h1 {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+<div class="login-container">
+    <div class="login-form">
+        <h1 class="title">Login</h1>
+        <form id="loginForm">
+            <div class="field">
+                <label class="label">Username or Email</label>
+                <div class="control">
+                    <input class="input" type="text" id="usernameOrEmail" name="usernameOrEmail" placeholder="Username or Email" required>
+                </div>
+            </div>
+            <div class="field">
+                <label class="label">Password</label>
+                <div class="control">
+                    <input class="input" type="password" name="password" placeholder="Password" required>
+                </div>
+            </div>
+            <div class="control">
+                <button class="button is-primary is-fullwidth" type="button" onclick="handleLogin()">Login</button>
+            </div>
+        </form>
+    </div>
+</div>
+<script src="/js/auth/login.js"></script>
+</body>
+</html>

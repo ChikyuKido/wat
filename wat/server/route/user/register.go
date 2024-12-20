@@ -1,6 +1,7 @@
 package wat
 
 import (
+	"github.com/ChikyuKido/wat/wat/helper"
 	repo "github.com/ChikyuKido/wat/wat/server/db/repo"
 	util "github.com/ChikyuKido/wat/wat/util"
 	"github.com/gin-gonic/gin"
@@ -28,7 +29,7 @@ func Register() gin.HandlerFunc {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "email must not be empty"})
 			return
 		}
-		if !util.IsValidEmail(registerData.Email) {
+		if !helper.IsValidEmail(registerData.Email) {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "invalid email"})
 			return
 		}
@@ -63,7 +64,12 @@ func Register() gin.HandlerFunc {
 		if !repo.AddRoleToUser(user.ID, 2) { // roleID = unverified user
 			logrus.Errorf("Failed to assign roles to a newly created user. User now has zero permissions")
 		}
-		c.JSON(http.StatusOK, gin.H{"message": "successful create an account"})
+		if util.Config.EmailVerification {
+			emailSend := helper.SendEmailVerificationForUser(user)
+			c.JSON(http.StatusOK, gin.H{"message": "successful create an account", "verification": true, "emailSent": emailSend})
+			return
+		}
+		c.JSON(http.StatusOK, gin.H{"message": "successful create an account", "verification": false})
 		return
 	}
 }

@@ -33,7 +33,7 @@ func Login() gin.HandlerFunc {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "bad request data"})
 			return
 		}
-		if *registerData.Email == "guest" || *registerData.Username == "guest" {
+		if (registerData.Email != nil && *registerData.Email == "guest") || (registerData.Username != nil && *registerData.Username == "guest") {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "guest is a reserved user"})
 			return
 		}

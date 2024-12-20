@@ -25,5 +25,4 @@ func InitRoutes(r *gin.Engine) {
 	admin.DELETE("/users/deleteUser", middleware.RequiredPermission("deleteUser"), adminroute.DeleteUser())
 	admin.DELETE("/users/removePermissionFromUser", middleware.RequiredPermission("changeUserPermissions"), adminroute.RemovePermissionToUser())
 	admin.DELETE("/users/removeRoleFromUser", middleware.RequiredPermission("changeUserPermissions"), adminroute.RemoveRoleFromUser())
-
 }
