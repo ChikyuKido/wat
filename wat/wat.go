@@ -26,13 +26,13 @@ func InitWat(engine *gin.Engine, database *gorm.DB, firstInit bool) {
 	logrus.Info("initialized routes")
 }
 
-func InitWatWebsite(engine *gin.Engine) {
+func InitWatWebsite(engine *gin.Engine, basePath string) {
 	sites := engine.Group("/")
-	util.ServeFolder("/css/", "./website/css", sites)
-	util.ServeFolder("/js/", "./website/js", sites)
-	util.ServeFile("/admin/dashboard", "./website/html/admin/dashboard.html", sites)
-	util.ServeFile("/auth/login", "./website/html/auth/login.html", sites)
-	util.ServeFile("/auth/register", "./website/html/auth/register.html", sites)
+	util.ServeFolder("/css/", basePath+"/css", sites)
+	util.ServeFolder("/js/", basePath+"/js", sites)
+	util.ServeFile("/admin/dashboard", basePath+"/html/admin/dashboard.html", sites)
+	util.ServeFile("/auth/login", basePath+"/html/auth/login.html", sites)
+	util.ServeFile("/auth/register", basePath+"/html/auth/register.html", sites)
 }
 
 func initEnv() bool {
