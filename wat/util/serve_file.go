@@ -50,7 +50,7 @@ func ServeFile(relPath, path string, r *gin.RouterGroup) {
 		content := getCachedContent(relPath, path)
 		contentType := mime.TypeByExtension(filepath.Ext(path))
 
-		if !strings.Contains(path, "imgs") {
+		if !strings.Contains(contentType, "image") {
 			c.Header("Content-Encoding", "br")
 		}
 		c.Header("Content-Type", contentType)
