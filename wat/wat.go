@@ -33,6 +33,7 @@ func InitWatWebsite(engine *gin.Engine, basePath string) {
 	util.ServeFile("/admin/dashboard", basePath+"/html/admin/dashboard.html", sites)
 	util.ServeFile("/auth/login", basePath+"/html/auth/login.html", sites)
 	util.ServeFile("/auth/register", basePath+"/html/auth/register.html", sites)
+	util.ServeFile("/auth/verify", basePath+"/html/auth/verify.html", sites)
 }
 
 func initEnv() bool {

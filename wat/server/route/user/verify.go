@@ -16,7 +16,7 @@ func Verify() gin.HandlerFunc {
 		}
 		verification := repo.GetVerificationFromUUID(id)
 		if verification == nil {
-			c.JSON(http.StatusNotFound, gin.H{"error": "uuid not found"})
+			c.JSON(http.StatusBadRequest, gin.H{"error": "uuid not found"})
 			return
 		}
 		if verification.Expires < time.Now().Unix() {
@@ -27,6 +27,8 @@ func Verify() gin.HandlerFunc {
 			c.JSON(http.StatusForbidden, gin.H{"error": "invalid user"})
 			return
 		}
+		repo.RemoveAllPermissionsFromUser(verification.UserID)
+		repo.AddRoleToUser(verification.UserID, 3) // user role
 		repo.DeleteVerificationByUUID(id)
 		c.JSON(http.StatusOK, gin.H{"message": "successful verified user"})
 	}

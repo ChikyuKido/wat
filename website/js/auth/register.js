@@ -16,6 +16,10 @@ function handleRegister() {
     })
         .then(response => response.json())
         .then(data => {
+            if(data.error) {
+                showMessage("Register failed: "+data.error);
+                return
+            }
             if(data.verification && data.emailSent) {
                 showMessage("Sent message to your email. Please verify it")
                 return

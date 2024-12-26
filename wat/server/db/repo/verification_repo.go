@@ -27,7 +27,9 @@ func GetVerificationFromUUID(uuid string) *entity.Verification {
 	return &verification
 }
 func DeleteVerificationByUUID(uuid string) {
-	if err := db.DB().Delete(&entity.Verification{}, uuid).Error; err != nil {
+	if err := db.DB().Delete(&entity.Verification{
+		UUID: uuid,
+	}).Error; err != nil {
 		logrus.Errorf("Failed to delete a verification: %v", err)
 	}
 }
