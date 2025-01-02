@@ -5,6 +5,7 @@ import (
 	repo "github.com/ChikyuKido/wat/wat/server/db/repo"
 	middleware "github.com/ChikyuKido/wat/wat/server/middleware"
 	wat "github.com/ChikyuKido/wat/wat/server/route"
+	"github.com/ChikyuKido/wat/wat/server/static"
 	util "github.com/ChikyuKido/wat/wat/util"
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
@@ -28,12 +29,16 @@ func InitWat(engine *gin.Engine, database *gorm.DB, firstInit bool) {
 
 func InitWatWebsite(engine *gin.Engine, basePath string) {
 	sites := engine.Group("/")
-	util.ServeFolder("/css/", basePath+"/css", sites)
-	util.ServeFolder("/js/", basePath+"/js", sites)
-	util.ServeFile("/admin/dashboard", basePath+"/html/admin/dashboard.html", sites)
-	util.ServeFile("/auth/login", basePath+"/html/auth/login.html", sites)
-	util.ServeFile("/auth/register", basePath+"/html/auth/register.html", sites)
-	util.ServeFile("/auth/verify", basePath+"/html/auth/verify.html", sites)
+	static.ServeFolder("/css/", basePath+"/css", nil, "wat", sites)
+	static.ServeFolder("/js/", basePath+"/js", nil, "wat", sites)
+	sites.GET("/admin/dashboard", static.ServeFile(basePath+"/html/admin/dashboard.html", nil, "wat"))
+	sites.GET("/auth/login", static.ServeFile(basePath+"/html/auth/login.html", nil, "wat"))
+	sites.GET("/auth/register", static.ServeFile(basePath+"/html/auth/register.html", nil, "wat"))
+	sites.GET("/auth/verify", static.ServeFile(basePath+"/html/auth/verify.html", nil, "wat"))
+	sites.GET("/invalidate", func(context *gin.Context) {
+		static.InvalidateArena("wat")
+		context.JSON(200, gin.H{"test": "TEST"})
+	})
 }
 
 func initEnv() bool {
