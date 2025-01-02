@@ -13,6 +13,13 @@ import (
 	"os"
 )
 
+var Roles = map[string][]string{
+	"guest":          {"login", "register"},
+	"unverifiedUser": {"login", "register", "sendVerification"},
+	"user":           {"login", "register", "sendVerification"},
+	"admin":          {"login", "register", "sendVerification", "queryPermissions", "queryUsers", "queryRoles", "changeUserPermissions", "deleteUser"},
+}
+
 func InitWat(engine *gin.Engine, database *gorm.DB, firstInit bool) {
 	initEnv()
 	logrus.Info("checked env variables")
@@ -81,25 +88,26 @@ func checkEnv(value string, envName string) {
 	}
 }
 func dataInit() {
-	repo.InsertNewPermission("login")
-	repo.InsertNewPermission("register")
-	repo.InsertNewPermission("sendVerification")
-	repo.InsertNewPermission("queryPermissions")
-	repo.InsertNewPermission("queryUsers")
-	repo.InsertNewPermission("queryRoles")
-	repo.InsertNewPermission("changeUserPermissions")
-	repo.InsertNewPermission("deleteUser")
-	repo.InsertNewRole("guest")
-	repo.AddPermissionToRole(1, 1)
-	repo.AddPermissionToRole(1, 2)
-	repo.InsertNewRole("unverifiedUser")
-	repo.AddPermissionToRole(2, 1)
-	repo.AddPermissionToRole(2, 2)
-	repo.AddPermissionToRole(2, 3)
-	repo.InsertNewRole("user")
-	repo.AddPermissionToRole(3, 1)
-	repo.AddPermissionToRole(3, 2)
-	repo.AddPermissionToRole(3, 3)
+	var allPermission = make(map[string]uint)
+	var counter uint = 1
+	for _, permissions := range Roles {
+		for _, permission := range permissions {
+			if _, exists := allPermission[permission]; exists {
+				continue
+			}
+			allPermission[permission] = counter
+			repo.InsertNewPermission(permission)
+			counter++
+		}
+	}
+	counter = 1
+	for role, permissions := range Roles {
+		repo.InsertNewRole(role)
+		for _, permission := range permissions {
+			repo.AddPermissionToRole(counter, allPermission[permission])
+		}
+		counter++
+	}
 	repo.InsertNewUser("guest", "", "guest")
 	repo.AddRoleToUser(1, 1)
 }
