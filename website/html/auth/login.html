@@ -19,6 +19,17 @@
         .login-form h1 {
             text-align: center;
         }
+        .register-link {
+            text-align: center;
+            margin-top: 15px;
+        }
+        .register-link a {
+            color: #3273dc;
+            text-decoration: none;
+        }
+        .register-link a:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
@@ -43,6 +54,9 @@
                 <button class="button is-primary is-fullwidth" type="button" onclick="handleLogin()">Login</button>
             </div>
         </form>
+        <div class="register-link">
+            <p>Don't have an account? <a href="/auth/register">Register here</a>.</p>
+        </div>
     </div>
 </div>
 <script src="/js/auth/login.js"></script>
