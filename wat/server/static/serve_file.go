@@ -9,16 +9,16 @@ import (
 	"strings"
 )
 
-type DataLoader func() any
+type DataLoader func(c *gin.Context) any
 
 func ServeFile(diskPath string, dataLoader DataLoader, cacheArena string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var data any = nil
 		// if the data is already cached don't load the data again because it isn't used
-		if GetLoadingState(cacheArena, diskPath) != Finished {
-			data = dataLoader()
+		if dataLoader != nil && GetLoadingState(cacheArena, c.Request.URL.String()) != Finished {
+			data = dataLoader(c)
 		}
-		content := LoadFile(diskPath, data, cacheArena)
+		content := LoadFile(c.Request.URL.String(), diskPath, data, cacheArena)
 		contentType := mime.TypeByExtension(filepath.Ext(diskPath))
 
 		if !strings.Contains(contentType, "image") {

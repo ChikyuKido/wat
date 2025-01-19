@@ -30,7 +30,7 @@ var (
 	templates []string
 )
 
-func LoadFile(path string, data any, cacheArena string) []byte {
+func LoadFile(path string, diskPath string, data any, cacheArena string) []byte {
 	if _, exists := caches[cacheArena]; !exists {
 		caches[cacheArena] = make(map[string]*Cache)
 	}
@@ -54,7 +54,7 @@ func LoadFile(path string, data any, cacheArena string) []byte {
 	}
 	go func() {
 		cache.loadingState = Loading
-		var content = loadFile(path, data, brotli.BestCompression)
+		var content = loadFile(diskPath, data, brotli.BestCompression)
 		if cache.loadingState != Invalidated { // if the cache was invalided during an update
 			cache.content = content
 			cache.loadingState = Finished
@@ -64,7 +64,7 @@ func LoadFile(path string, data any, cacheArena string) []byte {
 		}
 	}()
 	logrus.Debug("Cache is not loaded yet. Load it and return best speed cache")
-	return loadFile(path, data, brotli.BestSpeed)
+	return loadFile(diskPath, data, brotli.BestSpeed)
 }
 
 func LoadTemplates(directory string) {
