@@ -15,9 +15,9 @@ import (
 
 var Roles = map[string][]string{
 	"guest":          {"login", "register"},
-	"unverifiedUser": {"login", "register", "sendVerification"},
-	"user":           {"login", "register", "sendVerification"},
-	"admin":          {"login", "register", "sendVerification", "queryPermissions", "queryUsers", "queryRoles", "changeUserPermissions", "deleteUser"},
+	"unverifiedUser": {"login", "register", "sendVerification", "profile"},
+	"user":           {"login", "register", "sendVerification", "profile"},
+	"admin":          {"login", "register", "sendVerification", "profile", "queryPermissions", "queryUsers", "queryRoles", "changeUserPermissions", "deleteUser"},
 }
 
 func InitWat(engine *gin.Engine, database *gorm.DB, firstInit bool) {

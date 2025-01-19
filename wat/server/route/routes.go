@@ -16,6 +16,8 @@ func InitRoutes(r *gin.Engine) {
 		auth.POST("/sendVerification", middleware.RequiredPermission("sendVerification"), userroute.SendVerification())
 		auth.POST("/verify", userroute.Verify())
 	}
+	user := r.Group("/api/v1/user")
+	user.GET("/profile", middleware.RequiredPermission("profile"), userroute.GetProfile())
 	admin := r.Group("/api/v1/admin")
 	admin.GET("/permissions/list", middleware.RequiredPermission("queryPermissions"), adminroute.GetPermissions())
 	admin.GET("/users/list", middleware.RequiredPermission("queryUsers"), adminroute.GetUsers())

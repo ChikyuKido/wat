@@ -27,6 +27,7 @@ function handleLogin() {
                 showMessage("Login failed: "+data.error)
             }else {
                 console.log('Success:', data);
+                window.location = "/"
             }
         })
         .catch(error => {

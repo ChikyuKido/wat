@@ -56,7 +56,7 @@ func Login() gin.HandlerFunc {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "wrong credentials"})
 			return
 		}
-		token, err := util.GenerateJWT(*registerData.Email)
+		token, err := util.GenerateJWT(user.Email)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not generate token"})
 			return
