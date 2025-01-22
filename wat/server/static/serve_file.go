@@ -1,6 +1,7 @@
 package static
 
 import (
+	middleware "github.com/ChikyuKido/wat/wat/server/middleware"
 	"github.com/gin-gonic/gin"
 	"io/fs"
 	"mime"
@@ -30,7 +31,7 @@ func ServeFile(diskPath string, dataLoader DataLoader, cacheArena string) gin.Ha
 	}
 }
 
-func ServeFolder(rootPath, dir string, dataLoader DataLoader, cacheArena string, r *gin.RouterGroup) {
+func ServeFolder(rootPath, dir string, dataLoader DataLoader, cacheArena string, r *gin.RouterGroup, permission string) {
 	filepath.Walk(dir, func(path string, info fs.FileInfo, err error) error {
 		if err != nil {
 			return err
@@ -38,7 +39,11 @@ func ServeFolder(rootPath, dir string, dataLoader DataLoader, cacheArena string,
 		if !info.IsDir() {
 			relativePath, _ := filepath.Rel(dir, path)
 			urlPath := rootPath + relativePath
-			r.GET(urlPath, ServeFile(path, dataLoader, cacheArena))
+			if permission != "" {
+				r.GET(urlPath, middleware.RequiredPermission(permission, true), ServeFile(path, dataLoader, cacheArena))
+			} else {
+				r.GET(urlPath, ServeFile(path, dataLoader, cacheArena))
+			}
 		}
 		return nil
 	})

@@ -10,21 +10,21 @@ import (
 
 func InitRoutes(r *gin.Engine) {
 	auth := r.Group("/api/v1/auth")
-	auth.POST("/login", middleware.RequiredPermission("login"), userroute.Login())
-	auth.POST("/register", middleware.RequiredPermission("register"), userroute.Register())
+	auth.POST("/login", middleware.RequiredPermission("login", false), userroute.Login())
+	auth.POST("/register", middleware.RequiredPermission("register", false), userroute.Register())
 	if util.Config.EmailVerification {
-		auth.POST("/sendVerification", middleware.RequiredPermission("sendVerification"), userroute.SendVerification())
+		auth.POST("/sendVerification", middleware.RequiredPermission("sendVerification", false), userroute.SendVerification())
 		auth.POST("/verify", userroute.Verify())
 	}
 	user := r.Group("/api/v1/user")
-	user.GET("/profile", middleware.RequiredPermission("profile"), userroute.GetProfile())
+	user.GET("/profile", middleware.RequiredPermission("profile", false), userroute.GetProfile())
 	admin := r.Group("/api/v1/admin")
-	admin.GET("/permissions/list", middleware.RequiredPermission("queryPermissions"), adminroute.GetPermissions())
-	admin.GET("/users/list", middleware.RequiredPermission("queryUsers"), adminroute.GetUsers())
-	admin.GET("/roles/list", middleware.RequiredPermission("queryRoles"), adminroute.GetRoles())
-	admin.POST("/users/addPermissionToUser", middleware.RequiredPermission("changeUserPermissions"), adminroute.AddPermissionToUser())
-	admin.POST("/users/addRoleToUser", middleware.RequiredPermission("changeUserPermissions"), adminroute.AddRoleToUser())
-	admin.DELETE("/users/deleteUser", middleware.RequiredPermission("deleteUser"), adminroute.DeleteUser())
-	admin.DELETE("/users/removePermissionFromUser", middleware.RequiredPermission("changeUserPermissions"), adminroute.RemovePermissionToUser())
-	admin.DELETE("/users/removeRoleFromUser", middleware.RequiredPermission("changeUserPermissions"), adminroute.RemoveRoleFromUser())
+	admin.GET("/permissions/list", middleware.RequiredPermission("queryPermissions", false), adminroute.GetPermissions())
+	admin.GET("/users/list", middleware.RequiredPermission("queryUsers", false), adminroute.GetUsers())
+	admin.GET("/roles/list", middleware.RequiredPermission("queryRoles", false), adminroute.GetRoles())
+	admin.POST("/users/addPermissionToUser", middleware.RequiredPermission("changeUserPermissions", false), adminroute.AddPermissionToUser())
+	admin.POST("/users/addRoleToUser", middleware.RequiredPermission("changeUserPermissions", false), adminroute.AddRoleToUser())
+	admin.DELETE("/users/deleteUser", middleware.RequiredPermission("deleteUser", false), adminroute.DeleteUser())
+	admin.DELETE("/users/removePermissionFromUser", middleware.RequiredPermission("changeUserPermissions", false), adminroute.RemovePermissionToUser())
+	admin.DELETE("/users/removeRoleFromUser", middleware.RequiredPermission("changeUserPermissions", false), adminroute.RemoveRoleFromUser())
 }
