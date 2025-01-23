@@ -10,6 +10,7 @@ import (
 
 func InitRoutes(r *gin.Engine) {
 	auth := r.Group("/api/v1/auth")
+	auth.Use(middleware.AuthMiddleware())
 	auth.POST("/login", middleware.RequiredPermission("login", false), userroute.Login())
 	auth.POST("/register", middleware.RequiredPermission("register", false), userroute.Register())
 	if util.Config.EmailVerification {
@@ -17,8 +18,10 @@ func InitRoutes(r *gin.Engine) {
 		auth.POST("/verify", userroute.Verify())
 	}
 	user := r.Group("/api/v1/user")
+	user.Use(middleware.AuthMiddleware())
 	user.GET("/profile", middleware.RequiredPermission("profile", false), userroute.GetProfile())
 	admin := r.Group("/api/v1/admin")
+	admin.Use(middleware.AuthMiddleware())
 	admin.GET("/permissions/list", middleware.RequiredPermission("queryPermissions", false), adminroute.GetPermissions())
 	admin.GET("/users/list", middleware.RequiredPermission("queryUsers", false), adminroute.GetUsers())
 	admin.GET("/roles/list", middleware.RequiredPermission("queryRoles", false), adminroute.GetRoles())

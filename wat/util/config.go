@@ -10,4 +10,6 @@ var Config struct {
 	EmailVerificationUrl string
 	JwtSecret            string
 	Debug                bool
+	AllowedEmails        []string
+	FirstUser            bool
 }

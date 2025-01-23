@@ -33,6 +33,18 @@ func Register() gin.HandlerFunc {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "invalid email"})
 			return
 		}
+		found := false
+		for _, email := range util.Config.AllowedEmails {
+			if email == strings.Split(registerData.Email, "@")[1] {
+				found = true
+				break
+			}
+		}
+		if !found {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "the email domain is not allowed"})
+			return
+		}
+
 		if strings.TrimSpace(registerData.Username) == "" {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "username must not be empty"})
 			return
@@ -60,18 +72,26 @@ func Register() gin.HandlerFunc {
 			logrus.Errorf("Failed to create new user: %v", err)
 			return
 		}
-		user := repo.GetUserByEmail(registerData.Email)
-		if util.Config.EmailVerification {
-			if !repo.AddRoleToUser(user.ID, 2) { // roleID = unverified user
-				logrus.Errorf("Failed to assign roles to a newly created user. User now has zero permissions")
+		if !util.Config.FirstUser {
+			user := repo.GetUserByEmail(registerData.Email)
+			if util.Config.EmailVerification {
+				if !repo.AddRoleToUser(user.ID, 2) { // roleID = unverified user
+					logrus.Errorf("Failed to assign roles to a newly created user. User now has zero permissions")
+				}
+				emailSend := helper.SendEmailVerificationForUser(user)
+				c.JSON(http.StatusOK, gin.H{"message": "successful create an account", "verification": true, "emailSent": emailSend})
+				return
+			} else {
+				if !repo.AddRoleToUser(user.ID, 3) { // user
+					logrus.Errorf("Failed to assign roles to a newly created user. User now has zero permissions")
+				}
 			}
-			emailSend := helper.SendEmailVerificationForUser(user)
-			c.JSON(http.StatusOK, gin.H{"message": "successful create an account", "verification": true, "emailSent": emailSend})
-			return
 		} else {
-			if !repo.AddRoleToUser(user.ID, 3) { // user
+			user := repo.GetUserByEmail(registerData.Email)
+			if !repo.AddRoleToUser(user.ID, 4) { // admin
 				logrus.Errorf("Failed to assign roles to a newly created user. User now has zero permissions")
 			}
+			util.Config.FirstUser = false
 		}
 		c.JSON(http.StatusOK, gin.H{"message": "successful create an account", "verification": false})
 		return

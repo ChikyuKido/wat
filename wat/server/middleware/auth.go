@@ -20,6 +20,9 @@ func AuthMiddleware() gin.HandlerFunc {
 				return
 			}
 			c.Set("user", guest)
+			if firstRegister(c) {
+				return
+			}
 			c.Next()
 			return
 		}
@@ -46,7 +49,30 @@ func AuthMiddleware() gin.HandlerFunc {
 			c.Abort()
 			return
 		}
+
+		if firstRegister(c) {
+			return
+		}
 		c.Set("user", user)
 		c.Next()
 	}
+}
+
+func firstRegister(c *gin.Context) bool {
+	if util.Config.FirstUser {
+		if c.FullPath() == "/auth/adminRegister" || c.FullPath() == "/api/v1/auth/register" {
+			c.Next()
+		} else {
+			c.Redirect(http.StatusTemporaryRedirect, "/auth/adminRegister")
+			c.Abort()
+		}
+		return true
+	} else {
+		if c.FullPath() == "/auth/adminRegister" {
+			c.Redirect(http.StatusTemporaryRedirect, "/notfound")
+			c.Abort()
+			return true
+		}
+	}
+	return false
 }

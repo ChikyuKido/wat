@@ -5,19 +5,20 @@ import (
 	repo "github.com/ChikyuKido/wat/wat/server/db/repo"
 	middleware "github.com/ChikyuKido/wat/wat/server/middleware"
 	wat "github.com/ChikyuKido/wat/wat/server/route"
-	"github.com/ChikyuKido/wat/wat/server/static"
+	static "github.com/ChikyuKido/wat/wat/server/static"
 	util "github.com/ChikyuKido/wat/wat/util"
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
 	"os"
+	"strings"
 )
 
 var Roles = map[string][]string{
 	"guest":          {"login", "register"},
 	"unverifiedUser": {"login", "register", "sendVerification", "profile"},
 	"user":           {"login", "register", "sendVerification", "profile"},
-	"admin":          {"login", "register", "sendVerification", "profile", "queryPermissions", "queryUsers", "queryRoles", "changeUserPermissions", "deleteUser"},
+	"admin":          {"login", "register", "sendVerification", "profile", "dashboard", "queryPermissions", "queryUsers", "queryRoles", "changeUserPermissions", "deleteUser"},
 }
 
 func InitWat(engine *gin.Engine, database *gorm.DB, firstInit bool) {
@@ -29,19 +30,21 @@ func InitWat(engine *gin.Engine, database *gorm.DB, firstInit bool) {
 		dataInit()
 		logrus.Info("first init. Adding default data")
 	}
-	engine.Use(middleware.AuthMiddleware())
+	util.Config.FirstUser = len(repo.GetAllUsers()) == 1
 	wat.InitRoutes(engine)
 	logrus.Info("initialized routes")
 }
 
 func InitWatWebsite(engine *gin.Engine, basePath string) {
 	sites := engine.Group("/")
+	sitesWithoutAuth := engine.Group("/")
 	sites.Use(middleware.AuthMiddleware())
-	static.ServeFolder("/css/", basePath+"/css", nil, "wat", sites, "")
-	static.ServeFolder("/js/", basePath+"/js", nil, "wat", sites, "")
+	static.ServeFolder("/css/", basePath+"/css", nil, "wat", sitesWithoutAuth, "")
+	static.ServeFolder("/js/", basePath+"/js", nil, "wat", sitesWithoutAuth, "")
 	sites.GET("/admin/dashboard", middleware.RequiredPermission("dashboard", true), static.ServeFile(basePath+"/html/admin/dashboard.html", nil, "wat"))
 	sites.GET("/auth/login", middleware.RequiredPermission("login", true), static.ServeFile(basePath+"/html/auth/login.html", nil, "wat"))
 	sites.GET("/auth/register", middleware.RequiredPermission("register", true), static.ServeFile(basePath+"/html/auth/register.html", nil, "wat"))
+	sites.GET("/auth/adminRegister", static.ServeFile(basePath+"/html/auth/adminRegister.html", nil, "wat"))
 	sites.GET("/auth/verify", static.ServeFile(basePath+"/html/auth/verify.html", nil, "wat"))
 }
 
@@ -66,6 +69,7 @@ func initEnv() bool {
 	} else {
 		util.Config.EmailVerification = false
 	}
+	util.Config.AllowedEmails = strings.Split(os.Getenv("ALLOWED_EMAILS"), ",")
 	debug := os.Getenv("DEBUG")
 	checkEnv(debug, "DEBUG")
 	if debug == "true" {

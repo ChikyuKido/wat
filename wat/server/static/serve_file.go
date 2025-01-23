@@ -1,4 +1,4 @@
-package static
+package wat
 
 import (
 	middleware "github.com/ChikyuKido/wat/wat/server/middleware"
