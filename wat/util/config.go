@@ -12,4 +12,5 @@ var Config struct {
 	Debug                bool
 	AllowedEmails        []string
 	FirstUser            bool
+	ResourceVersion      string
 }

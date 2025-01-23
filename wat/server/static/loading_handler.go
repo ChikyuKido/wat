@@ -3,6 +3,7 @@ package wat
 import (
 	"bytes"
 	"fmt"
+	util "github.com/ChikyuKido/wat/wat/util"
 	"github.com/andybalholm/brotli"
 	"github.com/sirupsen/logrus"
 	"html/template"
@@ -128,6 +129,12 @@ func loadFile(path string, data any, compression int) []byte {
 		}
 	} else {
 		content, _ = os.ReadFile(path)
+	}
+	if strings.Contains(path, "html") && !util.Config.Debug {
+		bodyStr := string(content)
+		fmt.Println(bodyStr)
+		bodyStr = strings.ReplaceAll(bodyStr, "{rep}", util.Config.ResourceVersion)
+		content = []byte(bodyStr)
 	}
 	if !strings.Contains(path, "imgs") {
 		var compressedContent bytes.Buffer

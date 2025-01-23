@@ -1,6 +1,7 @@
 package wat
 
 import (
+	"fmt"
 	db "github.com/ChikyuKido/wat/wat/server/db"
 	repo "github.com/ChikyuKido/wat/wat/server/db/repo"
 	middleware "github.com/ChikyuKido/wat/wat/server/middleware"
@@ -80,7 +81,9 @@ func initEnv() bool {
 
 	util.Config.JwtSecret = os.Getenv("JWT_SECRET")
 	checkEnv(util.Config.JwtSecret, "JWT_SECRET")
-
+	util.Config.ResourceVersion = os.Getenv("RESOURCE_VERSION")
+	checkEnv(util.Config.ResourceVersion, "RESOURCE_VERSION")
+	fmt.Println(util.Config.ResourceVersion)
 	return true
 }
 func checkEnv(value string, envName string) {

@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login Page</title>
-    <link href="/css/bulma.css" rel="stylesheet">
+    <link href="/css/bulma.css?v={rep}" rel="stylesheet">
     <style>
         .login-container {
             max-width: 400px;
@@ -47,7 +47,7 @@
             <div class="field">
                 <label class="label">Password</label>
                 <div class="control">
-                    <input class="input" type="password" name="password" placeholder="Password" required>
+                    <input class="input" type="password" name="password" placeholder="Password" required id="passwordField">
                 </div>
             </div>
             <div class="control">
@@ -59,6 +59,6 @@
         </div>
     </div>
 </div>
-<script src="/js/auth/login.js"></script>
+<script src="/js/auth/login.js?v={rep}"></script>
 </body>
 </html>

@@ -43,3 +43,10 @@ function showMessage(content) {
     message.style.display = 'block';
     message.innerHTML = content;
 }
+
+document.getElementById('passwordField').addEventListener('keydown', function(event) {
+    if (event.key === 'Enter') {
+        event.preventDefault();
+        handleLogin()
+    }
+});

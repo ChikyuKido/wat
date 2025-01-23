@@ -2,6 +2,7 @@ package wat
 
 import (
 	middleware "github.com/ChikyuKido/wat/wat/server/middleware"
+	wat "github.com/ChikyuKido/wat/wat/util"
 	"github.com/gin-gonic/gin"
 	"io/fs"
 	"mime"
@@ -21,6 +22,10 @@ func ServeFile(diskPath string, dataLoader DataLoader, cacheArena string) gin.Ha
 		}
 		content := LoadFile(c.Request.URL.String(), diskPath, data, cacheArena)
 		contentType := mime.TypeByExtension(filepath.Ext(diskPath))
+
+		if !wat.Config.Debug && (filepath.Ext(diskPath) == ".css" || filepath.Ext(diskPath) == ".js" || filepath.Ext(diskPath) == ".webp") {
+			c.Header("Cache-Control", "public, max-age=31536000, immutable")
+		}
 
 		if !strings.Contains(contentType, "image") {
 			c.Header("Content-Encoding", "br")
