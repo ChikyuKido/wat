@@ -132,7 +132,6 @@ func loadFile(path string, data any, compression int) []byte {
 	}
 	if strings.Contains(path, "html") && !util.Config.Debug {
 		bodyStr := string(content)
-		fmt.Println(bodyStr)
 		bodyStr = strings.ReplaceAll(bodyStr, "{rep}", util.Config.ResourceVersion)
 		content = []byte(bodyStr)
 	}
