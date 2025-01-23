@@ -75,20 +75,20 @@ func Register() gin.HandlerFunc {
 		if !util.Config.FirstUser {
 			user := repo.GetUserByEmail(registerData.Email)
 			if util.Config.EmailVerification {
-				if !repo.AddRoleToUser(user.ID, 2) { // roleID = unverified user
+				if !repo.AddRoleToUser(user.ID, repo.GetRoleByName("unverifiedUser").ID) { // roleID = unverified user
 					logrus.Errorf("Failed to assign roles to a newly created user. User now has zero permissions")
 				}
 				emailSend := helper.SendEmailVerificationForUser(user)
 				c.JSON(http.StatusOK, gin.H{"message": "successful create an account", "verification": true, "emailSent": emailSend})
 				return
 			} else {
-				if !repo.AddRoleToUser(user.ID, 3) { // user
+				if !repo.AddRoleToUser(user.ID, repo.GetRoleByName("user").ID) { // user
 					logrus.Errorf("Failed to assign roles to a newly created user. User now has zero permissions")
 				}
 			}
 		} else {
 			user := repo.GetUserByEmail(registerData.Email)
-			if !repo.AddRoleToUser(user.ID, 4) { // admin
+			if !repo.AddRoleToUser(user.ID, repo.GetRoleByName("admin").ID) { // admin
 				logrus.Errorf("Failed to assign roles to a newly created user. User now has zero permissions")
 			}
 			util.Config.FirstUser = false

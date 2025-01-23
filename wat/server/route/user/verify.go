@@ -28,7 +28,7 @@ func Verify() gin.HandlerFunc {
 			return
 		}
 		repo.RemoveAllPermissionsFromUser(verification.UserID)
-		repo.AddRoleToUser(verification.UserID, 3) // user role
+		repo.AddRoleToUser(verification.UserID, repo.GetRoleByName("user").ID) // user role
 		repo.DeleteVerificationByUUID(id)
 		c.JSON(http.StatusOK, gin.H{"message": "successful verified user"})
 	}

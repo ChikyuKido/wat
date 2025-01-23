@@ -111,5 +111,5 @@ func dataInit() {
 		counter++
 	}
 	repo.InsertNewUser("guest", "", "guest")
-	repo.AddRoleToUser(1, 1)
+	repo.AddRoleToUser(1, repo.GetRoleByName("guest").ID)
 }
