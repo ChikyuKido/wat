@@ -111,7 +111,7 @@ func GetLoadingState(cacheArena, path string) LoadingState {
 }
 func loadFile(path string, data any, compression int) []byte {
 	var content []byte
-	if strings.HasSuffix(path, ".html") || strings.HasSuffix(path, ".js") {
+	if strings.HasSuffix(path, ".html") {
 		byteBuffer := bytes.NewBuffer(make([]byte, 0))
 		t, err := template.ParseFiles(append([]string{path}, templates...)...)
 		if err != nil {
@@ -124,9 +124,6 @@ func loadFile(path string, data any, compression int) []byte {
 			return nil
 		}
 		content = byteBuffer.Bytes()
-		if strings.HasSuffix(path, ".js") {
-			content = unescapeJavaScript(content)
-		}
 	} else {
 		content, _ = os.ReadFile(path)
 	}
@@ -148,12 +145,4 @@ func loadFile(path string, data any, compression int) []byte {
 	} else {
 		return content
 	}
-}
-
-func unescapeJavaScript(content []byte) []byte {
-	strContent := string(content)
-	strContent = strings.ReplaceAll(strContent, "&lt;", "<")
-	strContent = strings.ReplaceAll(strContent, "&gt;", ">")
-	strContent = strings.ReplaceAll(strContent, "&amp;", "&")
-	return []byte(strContent)
 }
