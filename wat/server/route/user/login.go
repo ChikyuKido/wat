@@ -5,13 +5,14 @@ import (
 	repo "github.com/ChikyuKido/wat/wat/server/db/repo"
 	util "github.com/ChikyuKido/wat/wat/util"
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 	"net/http"
 	"os"
 )
 
 func Login() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var registerData = struct {
+		var loginData = struct {
 			Email    *string `json:"email"`
 			Username *string `json:"username"`
 			Password string  `json:"password"`
@@ -25,34 +26,34 @@ func Login() gin.HandlerFunc {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "user already logged in"})
 			return
 		}
-		if err := c.ShouldBind(&registerData); err != nil {
+		if err := c.ShouldBind(&loginData); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "bad request data"})
 			return
 		}
-		if registerData.Email == nil && registerData.Username == nil {
+		if loginData.Email == nil && loginData.Username == nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "bad request data"})
 			return
 		}
-		if (registerData.Email != nil && *registerData.Email == "guest") || (registerData.Username != nil && *registerData.Username == "guest") {
+		if (loginData.Email != nil && *loginData.Email == "guest") || (loginData.Username != nil && *loginData.Username == "guest") {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "guest is a reserved user"})
 			return
 		}
 		var user *entity.User = nil
-		if registerData.Email != nil {
-			if !repo.DoesUserByEmailExist(*registerData.Email) {
+		if loginData.Email != nil {
+			if !repo.DoesUserByEmailExist(*loginData.Email) {
 				c.JSON(http.StatusBadRequest, gin.H{"error": "wrong credentials"})
 				return
 			}
-			user = repo.GetUserByEmail(*registerData.Email)
+			user = repo.GetUserByEmail(*loginData.Email)
 		}
 		if user == nil {
-			if !repo.DoesUserByUsernameExist(*registerData.Username) {
+			if !repo.DoesUserByUsernameExist(*loginData.Username) {
 				c.JSON(http.StatusBadRequest, gin.H{"error": "wrong credentials"})
 				return
 			}
-			user = repo.GetUserByUsername(*registerData.Username)
+			user = repo.GetUserByUsername(*loginData.Username)
 		}
-		if !util.CheckPassword(user.Password, registerData.Password) {
+		if !util.CheckPassword(user.Password, loginData.Password) {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "wrong credentials"})
 			return
 		}
@@ -61,8 +62,14 @@ func Login() gin.HandlerFunc {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not generate token"})
 			return
 		}
-		c.SetCookie("jwt", token, 60*60*24*30, "/", os.Getenv("DOMAIN"), false, true)
-		c.JSON(http.StatusOK, gin.H{"message": "Successfully logged in"})
+		if !user.Verified && util.Config.EmailVerification {
+			id := uuid.New()
+			verificationUUIDS[id.String()] = user.ID
+			c.JSON(http.StatusBadRequest, gin.H{"error": "This user is not verified yet.", "verificationUUID": id.String()})
+		} else {
+			c.SetCookie("jwt", token, 60*60*24*30, "/", os.Getenv("DOMAIN"), false, true)
+			c.JSON(http.StatusOK, gin.H{"message": "Successfully logged in"})
+		}
 		return
 	}
 }

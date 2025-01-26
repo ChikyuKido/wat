@@ -2,7 +2,9 @@ function handleRegister() {
     let username = document.getElementById('username').value;
     let email = document.getElementById('email').value;
     let password = document.querySelector('input[name="password"]').value;
+    const spinner = document.getElementById('loadingSpinner');
 
+    spinner.style.display = 'block';
     fetch('/api/v1/auth/register', {
         method: 'POST',
         headers: {
@@ -25,7 +27,7 @@ function handleRegister() {
                 return
             }
             if(data.verification && !data.emailSent) {
-                showMessage("Failed to send email.")
+                showMessage("Failed to send email. Please try to login and resend the verification email")
                 return
             }
             if(!data.verification) {
@@ -35,7 +37,9 @@ function handleRegister() {
         .catch(error => {
             showMessage("Failed to send request")
             console.log(error)
-        });
+        }) .finally(() => {
+        spinner.style.display = 'none';
+    });
 }
 
 function showMessage(content) {

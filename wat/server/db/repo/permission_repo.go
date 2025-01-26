@@ -27,6 +27,14 @@ func GetPermissionByID(id uint) *entity.Permission {
 	}
 	return &permission
 }
+func GetPermissionByName(name string) *entity.Permission {
+	var permission entity.Permission
+	if err := db.DB().Where("name = ?", name).First(&permission).Error; err != nil {
+		logrus.Errorf("failed to get permission: %v", err)
+		return nil
+	}
+	return &permission
+}
 func DoesPermissionByIDExists(id uint) bool {
 	var permission entity.Permission
 	if err := db.DB().Where(entity.Permission{ID: id}).First(&permission).Error; errors.Is(err, gorm.ErrRecordNotFound) {
